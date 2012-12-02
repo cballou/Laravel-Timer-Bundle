@@ -1,0 +1,137 @@
+## Timer Bundle
+
+The Laravel Timer bundle can be used as a drop-in alternative to utilizing the built-in
+profiler for determining execution time of segments of your code. It's like a
+stopwatch. It does not utilize callback functions as does Profiler, so there are
+a few benefits and drawbacks:
+
+#### Benefits ####
+
+You can make calls to the Timer from anywhere in your code. It doesn't require
+refactoring to use a bunch of callbacks if you have an existing codebase (as is
+the case with Profiler).
+
+#### Drawbacks ####
+
+The timer will be less accurate than the built in Profiler timer as Timer has a
+bit more scaffolding. With that being said, one could argue that the flexibility of
+not having to use callback functions is a huge benefit.
+
+Also, by not using callbacks, you're saving yourself on extra uneccessary function
+calls to call_user_func_array() and the like, likely improving application performance.
+
+## Installing using Artisan CLI:
+
+```bash
+php artisan bundle:install timer
+```
+
+Either auto-load the bundle in application/bundles.php:
+
+```php
+return array(
+    'timer' => array('auto' => true)
+);
+```
+
+Or manually start:
+
+```php
+Bundle::start('timer');
+```
+
+## Usage/Examples
+
+#### Creating a timer
+
+```php
+Timer::start('name-of-timer');
+
+// perform a task
+
+Timer::stop('name-of-timer');
+```
+
+#### Creating multiple timers
+You can create as many unique timers as you'd like.
+
+```php
+Timer::start('first-timer');
+Timer::start('second-timer');
+```
+
+#### Adding checkpoints to an existing timer
+
+Checkpoints can be created for an existing timer which will calculate the time from start as well as the time since last checkpoint.
+If you are familiar with the built in profiler and ticks, checkpoints are essentially the same thing. They are useful if you wish to
+use a single timer throughout your application and add in your own breakpoints.
+
+```php
+Timer::start('my-timer-name');
+
+// do some work
+sleep(2);
+
+// create a checkpoint
+Timer::checkpoint('my-timer-name', 'The first checkpoint after sleeping 2 seconds.');
+
+// do some more work
+sleep(1);
+
+// another checkpoint
+Timer::checkpoint('my-timer-name', 'A second checkpoint which will also calculate time elapsed from first checkpoint.');
+
+// some other stuff
+sleep(3);
+
+// end the timer and use return values as you please
+$values = Timer::stop('my-timer-name');
+```
+
+#### Retrieving timer results
+While you can retrieve a single timer's results as an array by calling `Timer::stop()`,
+you can also retrieve the full set of all timer results as a multi-dimensional array
+by calling `Timer::dump()`. If you have any currently running timers that you failed
+to stop, `Timer::dump()` makes sure to handle stopping them.
+
+`Timer::dump()` also takes a single boolean parameter, `$toFile`, which will create
+a timestamped log file in `storage/logs/timer_YYYY-MM-DD_HHiiSS.log`. This is
+helpful if you don't want to manually deal with your existing timers and prefer to
+analyze the results at a later date. The other benefit of storing timer results in
+a log file is that Timer will pretty print your results as JSON for easier readability.
+
+```php
+Timer::start('my-timer');
+
+// some work
+sleep(1);
+
+// create a second timer for the hell of it
+Timer::start('second-timer');
+
+// create a checkpoint on the first timer
+Timer::checkpoint('my-timer', 'A checkpoint for no good reason.');
+
+// some more work
+sleep(2);
+
+// choose one of the following two (with the second exporting results to log file)
+Timer::dump();
+Timer::dump(true);
+```
+
+#### Resetting all timers
+Timer has a built in method to clear out (reset) all pre-existing timers so you
+can start fresh. Likewise, simply re-using a timer name in `Timer::start()`
+will also clear out and re-initialize a single timer.
+
+```php
+// start a timer
+Timer::start('my-timer');
+
+// clear all existing timers
+Timer::clear();
+
+// we can reuse the existing timer
+Timer::start('my-timer');
+```
