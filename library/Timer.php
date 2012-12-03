@@ -87,14 +87,14 @@ class Timer {
         // calculate elapsed time
         static::$timers[$name]['checkpoints'][$count]['timeFromStart'] =
             number_format(
-                ($end - static::$timers[$name]['start']) * 1000,
+                $end - static::$timers[$name]['start'],
                 $decimals
             );
 
         if ($count > 0) {
             static::$timers[$name]['checkpoints'][$count]['timeFromLastCheckpoint'] =
                 number_format(
-                    (static::$timers[$name]['checkpoints'][$count - 1]['end'] - $end) * 1000,
+                    static::$timers[$name]['checkpoints'][$count - 1]['end'] - $end,
                     $decimals
                 );
         }
@@ -142,7 +142,7 @@ class Timer {
                 static::$timers[$name]['end'] = $end;
                 static::$timers[$name]['time'] =
                     number_format(
-                        ($end - static::$timers[$name]['start']) * 1000,
+                        $end - static::$timers[$name]['start'],
                         5
                     );
             }
