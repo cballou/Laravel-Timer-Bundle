@@ -94,7 +94,7 @@ class Timer {
         if ($count > 0) {
             static::$timers[$name]['checkpoints'][$count]['timeFromLastCheckpoint'] =
                 number_format(
-                    static::$timers[$name]['checkpoints'][$count - 1]['end'] - $end,
+                    $end - static::$timers[$name]['checkpoints'][$count - 1]['end'],
                     $decimals
                 );
         }
