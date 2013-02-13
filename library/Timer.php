@@ -116,7 +116,7 @@ class Timer {
 
         return array(
             'description' => 'Timer since LARAVEL_START.',
-            'start' => LARAVEL_START,
+            'start' => defined('LARAVEL_START') ? LARAVEL_START : microtime(true),
             'end' => NULL,
             'time' => NULL,
             'checkpoints' => array()
